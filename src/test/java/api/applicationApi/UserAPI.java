@@ -7,6 +7,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import pojo.User;
 
+import static api.applicationApi.Routes.USERS;
 import static io.restassured.RestAssured.given;
 
 public class UserAPI {
@@ -15,32 +16,34 @@ public class UserAPI {
 
     @Step
     public static Response post(User requestUser){
-        return RestResource.post("/public/v2/users", accessToken, requestUser);
+        return RestResource.post(USERS, accessToken, requestUser);
     }
 
     @Step
     public static Response post(User requestUser, String token){
-        return RestResource.post("/public/v2/users", token, requestUser);
+        return RestResource.post(USERS, token, requestUser);
     }
 
     @Step
     public static Response get(int userId){
-        return RestResource.get("/public/v2/users/"+userId, accessToken);
+
+        return RestResource.get(USERS +"/" +userId, accessToken);
     }
 
     @Step
     public static Response put(User requestUser, int userId){
-        return RestResource.put("/public/v2/users/"+userId, accessToken, requestUser);
+        return RestResource.put(USERS + "/" +userId, accessToken, requestUser);
     }
 
     @Step
     public static Response patch(User requestUser, int userId){
-        return RestResource.patch("/public/v2/users/" +userId, accessToken, requestUser);
+        return RestResource.patch(USERS +"/" +userId, accessToken, requestUser);
     }
 
     @Step
     public static Response delete(int userId){
-        return RestResource.delete("/public/v2/users/"+userId, accessToken);
+
+        return RestResource.delete(USERS + "/" +userId, accessToken);
     }
 
 }

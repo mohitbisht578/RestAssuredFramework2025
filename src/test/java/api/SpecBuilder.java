@@ -7,12 +7,13 @@ import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
+import utils.ConfigReader;
 
 public class SpecBuilder {
 
     public static RequestSpecification getRequestSpec(){
        return new RequestSpecBuilder()
-                .setBaseUri("https://gorest.co.in")
+                .setBaseUri(ConfigReader.get("baseUri"))
                .addFilter(new AllureRestAssured())
                 .log(LogDetail.ALL).build();
     }
