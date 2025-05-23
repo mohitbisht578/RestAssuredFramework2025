@@ -1,24 +1,16 @@
 package gorest;
 
-import api.SpecBuilder;
 import api.applicationApi.StatusCode;
 import api.applicationApi.UserAPI;
 import io.qameta.allure.Step;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import jdk.jfr.Description;
 import org.testng.annotations.Test;
 import pojo.ErrorMessage;
 import pojo.ErrorResponse;
 import pojo.User;
-import utils.JsonUtils;
-import utils.RestUtils;
 import utils.TestDataUtils;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
