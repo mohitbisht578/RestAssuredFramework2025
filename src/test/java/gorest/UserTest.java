@@ -13,6 +13,7 @@ import pojo.ErrorResponse;
 import pojo.User;
 import utils.JsonUtils;
 import utils.RestUtils;
+import utils.TestDataUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,23 +27,18 @@ import static org.hamcrest.Matchers.greaterThan;
 
 public class UserTest {
 
-    public static String generateRandomEmail() {
-        return "user_" + UUID.randomUUID().toString().substring(0, 8) + "@example.com";
-    }
-
     int userId;
     User expectedUser; // holds created data
     User updatedUser;  // holds updated data
 
     @Step
-    @Test(description = "should be able to create a user", priority = 1)
+    @Test(priority = 1, description = "Should create a user successfully")
     public void createUserTest(){
-
         expectedUser = new User();
-        expectedUser.setName("Tom");
-        expectedUser.setEmail(generateRandomEmail());
-        expectedUser.setGender("male");
-        expectedUser.setStatus("active");
+        expectedUser.setName(TestDataUtils.getFullName());
+        expectedUser.setEmail(TestDataUtils.getEmail());
+        expectedUser.setGender(TestDataUtils.getGender());
+        expectedUser.setStatus(TestDataUtils.getStatus());
 
         Response response = UserAPI.post(expectedUser);
         assertThat(response.statusCode(), equalTo(StatusCode.CODE_201.getCode()));
@@ -50,19 +46,22 @@ public class UserTest {
         User responseUser = response.as(User.class);
         userId = responseUser.getId();
         System.out.println("USER ID ==> " + userId);
+        assertUserEqual(responseUser, expectedUser);
         assertThat(responseUser.getName(), equalTo(expectedUser.getName()));
         assertThat(responseUser.getEmail(), equalTo(expectedUser.getEmail()));
         assertThat(responseUser.getGender(), equalTo(expectedUser.getGender()));
         assertThat(responseUser.getStatus(), equalTo(expectedUser.getStatus()));
     }
 
-    @Test(priority = 2)
+    @Test(priority = 2, description = "Should retrieve the created user")
     public void getUserTest(){
 
         Response response = UserAPI.get(userId);
         assertThat(response.statusCode(), equalTo(StatusCode.CODE_200.getCode()));
 
         User responseUser = response.as(User.class);
+        assertUserEqual(responseUser, expectedUser);
+
         assertThat(responseUser.getId(), equalTo(userId));
         assertThat(responseUser.getName(), equalTo( expectedUser.getName()));
         assertThat(responseUser.getEmail(), equalTo( expectedUser.getEmail()));
@@ -72,14 +71,14 @@ public class UserTest {
     }
 
     @Step
-    @Test(priority = 3)
-    public void shouldNotAbleToCreateAUserTest(){
+    @Test(priority = 3, description = "Should not create a user with blank name")
+    public void shouldNotCreateUserWithBlankName(){
 
         expectedUser = new User();
         expectedUser.setName(""); // Invalid
-        expectedUser.setEmail(generateRandomEmail());
-        expectedUser.setGender("male");
-        expectedUser.setStatus("active");
+        expectedUser.setEmail(TestDataUtils.getEmail());
+        expectedUser.setGender(TestDataUtils.getGender());
+        expectedUser.setStatus(TestDataUtils.getStatus());
 
         Response response = UserAPI.post(expectedUser);
         assertThat(response.statusCode(), equalTo(StatusCode.CODE_422.getCode()));
@@ -92,14 +91,15 @@ public class UserTest {
     }
 
     @Step
-    @Test(priority = 3)
-    public void shouldNotAbleToCreateAUserWithInvalidToken(){
+    @Test(priority = 4, description = "Should not create a user with invalid token")
+    public void shouldNotCreateUserWithInvalidToken(){
+
         String invalid_token = "12345";
         expectedUser = new User();
-        expectedUser.setName("Tom");
-        expectedUser.setEmail(generateRandomEmail());
-        expectedUser.setGender("male");
-        expectedUser.setStatus("active");
+        expectedUser.setName(TestDataUtils.getFullName());
+        expectedUser.setEmail(TestDataUtils.getEmail());
+        expectedUser.setGender(TestDataUtils.getGender());
+        expectedUser.setStatus(TestDataUtils.getStatus());
 
         Response response = UserAPI.post(expectedUser, invalid_token);
         assertThat(response.statusCode(), equalTo(StatusCode.CODE_401.getCode()));
@@ -110,26 +110,24 @@ public class UserTest {
     }
 
     @Step
-    @Test(priority = 3)
+    @Test(priority = 5, description = "Should update user details")
     public void updateUserTest(){
 
         updatedUser = new User();
-        updatedUser.setName("John Doe");
-        updatedUser.setEmail(generateRandomEmail());
-        updatedUser.setGender("male");
-        updatedUser.setStatus("inactive");
+        updatedUser.setName(TestDataUtils.getFullName());
+        updatedUser.setEmail(TestDataUtils.getEmail());
+        updatedUser.setGender(TestDataUtils.getGender());
+        updatedUser.setStatus(TestDataUtils.getStatus());
+
         Response response = UserAPI.put(updatedUser, userId);
         assertThat(response.statusCode(), equalTo(StatusCode.CODE_200.getCode()));
         User responseUser = response.as(User.class);
+        assertUserEqual(responseUser, updatedUser);
 
-        assertThat(responseUser.getName(), equalTo(updatedUser.getName()));
-        assertThat(responseUser.getEmail(), equalTo(updatedUser.getEmail()));
-        assertThat(responseUser.getGender(), equalTo(updatedUser.getGender()));
-        assertThat(responseUser.getStatus(), equalTo(updatedUser.getStatus()));
     }
 
     @Step
-    @Test(priority = 4)
+    @Test(priority = 6, description = "Should retrieve updated user details")
     public void getUpdatedUserTest(){
 
         Response response = UserAPI.get(userId);
@@ -137,45 +135,28 @@ public class UserTest {
 
         User responseUser = response.as(User.class);
         assertThat(responseUser.getId(), equalTo(userId));
-        assertThat(responseUser.getName(), equalTo(updatedUser.getName()));
-        assertThat(responseUser.getEmail(), equalTo(updatedUser.getEmail()));
-        assertThat(responseUser.getGender(), equalTo(updatedUser.getGender()));
-        assertThat(responseUser.getStatus(), equalTo(updatedUser.getStatus()));
+        assertUserEqual(responseUser, updatedUser);
+
     }
 
     @Step
-    @Test(priority = 5)
+    @Test(priority = 7, description = "Should delete user")
     public void deleteUser(){
         Response response = UserAPI.delete(userId);
         assertThat(response.statusCode(), equalTo(StatusCode.CODE_204.getCode()));
     }
 
     @Step
-    public User userBuilder(String name, String email, String gender, String status){
-        expectedUser = new User();
-        expectedUser.setName(name);
-        expectedUser.setEmail(generateRandomEmail());
-        expectedUser.setGender("male");
-        expectedUser.setStatus("active");
-        return expectedUser;
-    }
-
-    @Step
     public void assertUserEqual(User responseUser, User requestUser){
-        assertThat(responseUser.getName(), equalTo(expectedUser.getName()));
-        assertThat(responseUser.getEmail(), equalTo(expectedUser.getEmail()));
-        assertThat(responseUser.getGender(), equalTo(expectedUser.getGender()));
-        assertThat(responseUser.getStatus(), equalTo(expectedUser.getStatus()));
+        assertThat(responseUser.getName(), equalTo(requestUser.getName()));
+        assertThat(responseUser.getEmail(), equalTo(requestUser.getEmail()));
+        assertThat(responseUser.getGender(), equalTo(requestUser.getGender()));
+        assertThat(responseUser.getStatus(), equalTo(requestUser.getStatus()));
     }
 
     @Step
     public void assertStatusCode(int actualStatusCode, int expectedStatusCode){
         assertThat(actualStatusCode, equalTo(expectedStatusCode));
     }
-
-//    @Step
-//    public void assertError(int actualStatusCode, int expectedStatusCode){
-//        assertThat(actualStatusCode, equalTo(expectedStatusCode));
-//    }
 
 }
