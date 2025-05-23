@@ -1,0 +1,64 @@
+# Maven
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.properties
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+out/
+
+# Eclipse
+*.class
+.project
+.classpath
+.settings/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Logs & Reports
+*.log
+/logs/
+/reports/
+/test-output/
+/allure-results/
+/allure-report/
+
+# Dependency Cache
+/.gradle/
+/build/
+
+# Temp & Backup
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# Config Files (optional, if not versioned)
+.env
+config.properties
+application.properties
+
+# Test Artifacts (optional)
+*.json
+*.xml
+*.csv
+*.xlsx
+
+# VS Code
+.vscode/
+
+# Mac System Files
+__MACOSX/
+
+# JUnit/RestAssured generated files
+hs_err_pid*
+.replay_pid*
+
+# Java coverage tools (e.g., Jacoco)
+jacoco.exec
+coverage-reports/
